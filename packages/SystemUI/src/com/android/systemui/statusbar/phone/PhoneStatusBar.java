@@ -186,8 +186,6 @@ public class PhoneStatusBar extends StatusBar {
     // top bar
     TextView mNoNotificationsTitle;
     View mClearButton;
-    RelativeLayout.LayoutParams mClearParams;
-
     View mSettingsButton;
     View mLiquidButton;
 
@@ -386,10 +384,6 @@ public class PhoneStatusBar extends StatusBar {
         mNoNotificationsTitle = (TextView) expanded.findViewById(R.id.noNotificationsTitle);
         mNoNotificationsTitle.setVisibility(View.GONE); // disabling for now
 
-
-        mTxtLayout = (LinearLayout) expanded.findViewById(R.id.txtlayout);
-        mTxtParams = (RelativeLayout.LayoutParams) mTxtLayout.getLayoutParams();
-
         mClearButton = expanded.findViewById(R.id.clear_all_button);
         mClearButton.setOnClickListener(mClearButtonListener);
         mClearButton.setAlpha(0f);
@@ -560,23 +554,14 @@ public class PhoneStatusBar extends StatusBar {
 
         // Provide RecentsPanelView with a temporary parent to allow layout params to work.
         LinearLayout tmpRoot = new LinearLayout(mContext);
-
-        int recent_style = Settings.System.getInt(mContext.getContentResolver(),
-                      Settings.System.RECENT_APP_SWITCHER,0);
-
-        if (recent_style == 1) {
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.HORIZONTAL_RECENTS_TASK_PANEL, 0) == 1) {
             mRecentsPanel = (RecentsPanelView) LayoutInflater.from(mContext).inflate(
                     R.layout.status_bar_recent_panel_webaokp, tmpRoot, false);
-        }
-        else if (recent_style == 2) {
-            mRecentsPanel = (RecentsPanelView) LayoutInflater.from(mContext).inflate(
-                    R.layout.status_bar_recent_panel_sense4, tmpRoot, false);
-        }
-        else {
+        } else {
             mRecentsPanel = (RecentsPanelView) LayoutInflater.from(mContext).inflate(
                     R.layout.status_bar_recent_panel, tmpRoot, false);
         }
-
         mRecentsPanel.setRecentTasksLoader(mRecentTasksLoader);
         mRecentTasksLoader.setRecentsPanel(mRecentsPanel);
         mRecentsPanel.setOnTouchListener(new TouchOutsideListener(MSG_CLOSE_RECENTS_PANEL,
@@ -2629,7 +2614,7 @@ public class PhoneStatusBar extends StatusBar {
     private void updateSettings() {
         // Check all our settings and respond accordingly
         // Slog.i(TAG, "updated settings values");
-
+    	
     	int fontSize = 16;
 
         ContentResolver cr = mContext.getContentResolver();
@@ -2641,13 +2626,6 @@ public class PhoneStatusBar extends StatusBar {
 
         mDropdownDateBehavior = Settings.System.getInt(cr,
                 Settings.System.STATUSBAR_DATE_BEHAVIOR, 0) == 1;
-
-        mIsStatusBarBrightNess = Settings.System.getInt(mStatusBarView.getContext()
-                .getContentResolver(),
-                Settings.System.STATUS_BAR_BRIGHTNESS_TOGGLE, 0) == 1;
-
-        loadDimens();
-        fontSize = Settings.System.getInt(cr, Settings.System.STATUSBAR_FONT_SIZE, 16) ;
 
         fontSize = Settings.System.getInt(cr, Settings.System.STATUSBAR_FONT_SIZE, 16) ;
         
@@ -2674,24 +2652,6 @@ public class PhoneStatusBar extends StatusBar {
         if (DEBUG) Log.d(TAG, "mUserStatusbarBackground: " + mUserStatusbarBackground);
         if (mControlLiquidIcon) {
             mLiquidButton.setVisibility(View.GONE);
-        reDrawHeader();
-    }
-
-    private void reDrawHeader() {
-        if (mWeatherPanelEnabled) {
-            mTxtParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
-            mTxtParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-            mTxtLayout.setPadding(0, 1, 0, 0);
-            mSettingswClearParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-            mSettingswClearParams.addRule(RelativeLayout.RIGHT_OF, 0);
-            mSettingswClearParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-            mSettingswClearParams.addRule(RelativeLayout.CENTER_VERTICAL, 0);
-            mSettingswoClearParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-            mSettingswoClearParams.addRule(RelativeLayout.RIGHT_OF, 0);
-            mClearParams.addRule(RelativeLayout.BELOW, R.id.settings_button);
-            mClearParams.addRule(RelativeLayout.CENTER_VERTICAL, 0);
-            mWeatherPanel1.setVisibility(View.VISIBLE);
-            mWeatherPanel2.setVisibility(View.VISIBLE);
         } else {
             mLiquidButton.setVisibility(View.VISIBLE);
         }
@@ -2905,10 +2865,6 @@ public class PhoneStatusBar extends StatusBar {
 
         int newIconSize = res.getDimensionPixelSize(
                 com.android.internal.R.dimen.status_bar_icon_size);
-
-        sbSizeOffset = (int) (newIconSize - sbOffsetpx);
-        newIconSize = (int) (sbSizeOffset + fontSizepx);
-
         int newIconHPadding = res.getDimensionPixelSize(
                 R.dimen.status_bar_icon_padding);
 
