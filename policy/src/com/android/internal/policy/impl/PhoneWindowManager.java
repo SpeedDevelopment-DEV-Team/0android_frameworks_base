@@ -1277,6 +1277,7 @@ return visibleValue;
 public void adjustConfigurationLw(Configuration config) {
 readLidState();
 updateKeyboardVisibility();
+    }
     public boolean doesForceHide(WindowState win, WindowManager.LayoutParams attrs) {
         return attrs.type == WindowManager.LayoutParams.TYPE_KEYGUARD;
     }
