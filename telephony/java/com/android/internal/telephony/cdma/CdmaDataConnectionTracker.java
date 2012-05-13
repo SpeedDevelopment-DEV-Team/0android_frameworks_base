@@ -941,6 +941,8 @@ public final class CdmaDataConnectionTracker extends DataConnectionTracker {
                 default:
                     log("onDataStateChanged: IGNORE unexpected DataCallState.active="
                             + connectionState);
+        Log.v(LOG_TAG, "KD: Tear Down bad connection; reset");
+          cleanUpConnection(true, "Hung data detected; reset");
             }
         } else {
             // TODO: Do we need to do anything?
